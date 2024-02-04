@@ -2,34 +2,43 @@ import numpy as np
 import matplotlib.pyplot as plt
 
 
+# Bandit is Slot Machine
 class Bandit:
-    def __init__(self, arms=10): 
-        self.rates = np.random.rand(arms)  # 슬롯머신 각각의 승률 설정(무작위)
+    # 슬롯 머신 초기화
+    def __init__(self, arms=10):
+        # Random win rate
+        self.rates = np.random.rand(arms)
 
-    def play(self, arm):
+    # 승률과 난수 간의 비교
+    def play(self,arm):
         rate = self.rates[arm]
+        # Compare win rate with random num
         if rate > np.random.rand():
             return 1
         else:
             return 0
 
-
 class Agent:
+    # 에이전트 초기화
     def __init__(self, epsilon, action_size=10):
-        self.epsilon = epsilon  # 무작위로 행동할 확률(탐색 확률)
-        self.Qs = np.zeros(action_size)
-        self.ns = np.zeros(action_size)
+        self.epsilon = epsilon  # 탐험을 위한 epsilon 값 설정
+        self.Qs = np.zeros(action_size)  # 각 행동의 가치를 저장할 배열 초기화
+        self.ns = np.zeros(action_size)  # 각 행동이 선택된 횟수를 저장할 배열 초기화
 
-    # 슬롯머신의 가치 추정
+    # 에이전트의 행동 가치 업데이트
     def update(self, action, reward):
-        self.ns[action] += 1
+        self.ns[action] += 1  # 선택된 행동의 카운트 증가
+        # 선택된 행동의 가치(Q)를 업데이트하는 공식: Q = Q + (보상 - Q) / n
         self.Qs[action] += (reward - self.Qs[action]) / self.ns[action]
 
-    # 행동 선택(ε-탐욕 정책)
+    # 에이전트의 행동 선택
     def get_action(self):
         if np.random.rand() < self.epsilon:
-            return np.random.randint(0, len(self.Qs))  # 무작위 행동 선택
-        return np.argmax(self.Qs)  # 탐욕 행동 선택
+            # epsilon 확률로 무작위 행동 선택
+            return np.random.randint(0, len(self.Qs))
+        # 그렇지 않으면 현재 가장 가치가 높은 행동 선택
+        return np.argmax(self.Qs)
+
 
 
 if __name__ == '__main__':
